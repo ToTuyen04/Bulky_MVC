@@ -17,6 +17,56 @@ namespace BulkyWeb.Controllers
             return View(objCategoryList);
         }
 
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeletePOST(int? id)
+        {
+            var obj = _db.Categories.Find(id);
+            if (obj == null)
+                return NotFound();
+            _db.Categories.Remove(obj);
+            _db.SaveChanges();
+            TempData["success"] = "Category deleted successfully";
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Delete(int categoryId)
+        {
+            var obj = _db.Categories.FirstOrDefault(c => c.Id == categoryId);
+            if (obj == null)
+            {
+                return View("Index");
+            }
+            return View(obj);
+        }
+        
+        public IActionResult Edit(int? categoryId)
+        {
+            if(categoryId == null || categoryId == 0)
+            {
+                return NotFound();
+            }
+            var obj = _db.Categories.Find(categoryId);
+            var obj2 = _db.Categories.FirstOrDefault(c => c.Id==categoryId);
+            var obj3 = _db.Categories.Where(c=>c.Id == categoryId).FirstOrDefault();
+            if(obj == null)
+            {
+                return NotFound();
+            }
+            return View(obj);
+        }
+        [HttpPost]
+        public IActionResult Edit(Category obj)
+        {
+            if (ModelState.IsValid)
+            {
+                _db.Categories.Update(obj);
+                _db.SaveChanges();
+                TempData["success"] = "Category updated successfully";
+                return RedirectToAction("Index", "Category");
+            }
+            return View();
+        }
+
         public IActionResult Create()
         {
             return View();
@@ -37,6 +87,7 @@ namespace BulkyWeb.Controllers
             {
                 _db.Categories.Add(obj);
                 _db.SaveChanges();
+                TempData["success"] = "Category created successfully";
                 return RedirectToAction("Index");
             }
             return View();
